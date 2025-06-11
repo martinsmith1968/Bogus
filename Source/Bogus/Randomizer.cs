@@ -709,6 +709,20 @@ public class Randomizer
 
       return this.ArrayElements(enums, count);
    }
+   
+   /// <summary>
+   /// Picks a random subset of Enum Flag values and returns as a single value.
+   /// </summary>
+   /// <typeparam name="T">The enum.</typeparam>
+   /// <param name="count">The number of enums to pick.</param>
+   /// <param name="exclude">Any enums that should be excluded before picking.</param>
+   /// <returns>A set of Enum Flag values, as a single Enum value</returns>
+   public T EnumFlags<T>(int? count = null, params T[] exclude) where T : Enum
+   {
+      var values = this.EnumValues<T>(count, exclude);
+
+      return values.Aggregate(default(T), (current, value) => (dynamic)current | value);
+   }
 
    /// <summary>
    /// Shuffles an IEnumerable source.
@@ -716,11 +730,11 @@ public class Randomizer
    public IEnumerable<T> Shuffle<T>(IEnumerable<T> source)
    {
       List<T> buffer = source.ToList();
-      for( var i = 0; i < buffer.Count; i++ )
+      for (var i = 0; i < buffer.Count; i++)
       {
          int j;
          //lock any seed access, for thread safety.
-         lock( Locker.Value )
+         lock (Locker.Value)
          {
             j = this.localSeed.Next(i, buffer.Count);
          }
